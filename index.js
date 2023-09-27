@@ -1,0 +1,15 @@
+import {Database} from "bun:sqlite";
+const a = [Bun.argv[2], Bun.argv[3]];
+const b = a[0].match("[^-p=].*").toString();
+const c = a[1].match("[^-n=].*").toString();
+const hash = await Bun.password.hash(b) + "\n";
+console.write(hash);
+const db = new Database(".app.db", { create: true });
+db.run("CREATE TABLE IF NOT EXISTS PASS (PASSWORD varchar, NAME varchar);");
+const query = db.query("INSERT INTO PASS values ($pass, $name);");
+query.run(hash, c);
+query.finalize();
+const query2 = db.query("SELECT * FROM PASS");
+console.log(query2.get());
+query2.finalize();
+db.close();
